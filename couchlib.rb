@@ -54,4 +54,20 @@ module Couch
       end
     end
   end
+  class Table
+    def initialize(name)
+      @name = name
+    end
+    def query(hash)
+      uri = URI("http://#{Host}/#{@name}/_find")
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        request = Net::HTTP::Post.new uri
+        request.basic_auth Login, Password
+        request['Content-Type'] = 'application/json'
+        request.body = JSON.generate({selector: hash})
+        response = http.request request
+        return response.body
+      end
+    end
+  end
 end
